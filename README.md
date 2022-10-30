@@ -1,2 +1,2 @@
 # DW-Entregas
-Aplicação dos conceitos de Date Warehouse para um sistema de logística
+Aplicação dos conceitos de Data Warehouse para um sistema de logística
