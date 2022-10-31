@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS Dim_Tempo
 CREATE TABLE Dim_Status (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	cod_status INT NOT NULL,
-	status VARCHAR(15) NOT NULL CHECK(status IN ('Entregue','Em Transporte','Extraviado','Em Preparacao'))
+	status VARCHAR(15) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
 )
 CREATE INDEX IX_Dim_Status ON Dim_Status(cod_status)
 
@@ -45,6 +45,7 @@ CREATE INDEX IX_Dim_Regiao ON Dim_Regiao(cod_regiao)
 CREATE TABLE Dim_Estado (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	cod_estado INT NOT NULL,
+	estado VARCHAR(45) NOT NULL,
 	UF CHAR(2) NOT NULl,
 	cod_regiao INT NOT NULL
 )
