@@ -1,2 +1,1 @@
-create database bd_rede_postos
-
+create database bd_rede_entregas
