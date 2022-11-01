@@ -3,47 +3,46 @@
 /*
    sp_povar_vendas
 
-   A ideia desse procedimento é gerar vendas
-   entre duas datas de maneira aleatória.
+   A ideia desse procedimento ï¿½ gerar vendas
+   entre duas datas de maneira aleatï¿½ria.
 
-   A ideia geral é fazer um loop inicial entre a data inicial
-   e data final passadas como parâmetro.
+   A ideia geral ï¿½ fazer um loop inicial entre a data inicial
+   e data final passadas como parï¿½metro.
 
    Dentro desse loop, vamos fazer um outro loop com uma quantidade 
-   de vendas aleatória para cada dia e incluir também vendas
-   como valores aleatórios para tipo de pagamento, codigo da loja,
+   de vendas aleatï¿½ria para cada dia e incluir tambï¿½m vendas
+   como valores aleatï¿½rios para tipo de pagamento, codigo da loja,
    codigo do produto, etc.
 
    Como o objetivo de deixar a coisa um pouco mais real, foram
-   criados dois loops: Um para combustível e outro para lubrificantes uma
-   vez que o volume vendido de combustível é bem diferente do volume
+   criados dois loops: Um para combustï¿½vel e outro para lubrificantes uma
+   vez que o volume vendido de combustï¿½vel ï¿½ bem diferente do volume
    vendido de lubrificante.
 
-   Para conseguir gerar os números aleatórios,
-   podemos utilizar as seguinte expressões em T-SQL:
+   Para conseguir gerar os nï¿½meros aleatï¿½rios,
+   podemos utilizar as seguinte expressï¿½es em T-SQL:
 
-   Para números decimais:
+   Para nï¿½meros decimais:
    SELECT RAND()*(b-a)+a;
-   Onde b é o maior número
-   e a é o menor número
+   Onde b ï¿½ o maior nï¿½mero
+   e a ï¿½ o menor nï¿½mero
 
-   Para números inteiros:
+   Para nï¿½meros inteiros:
    SELECT FLOOR(RAND()*(b-a+1))+a;
-   Onde b é o maior número
-   e a é o menor número
+   Onde b ï¿½ o maior nï¿½mero
+   e a ï¿½ o menor nï¿½mero
 
     Exemplos: 
 
-	Gerar um valor decimal aleatório entre 10.0 e 100.0
+	Gerar um valor decimal aleatï¿½rio entre 10.0 e 100.0
 	SELECT RAND()*(100-10)+10;
 
-	Gerar um valor inteiro aleatório entre 1 e 7
+	Gerar um valor inteiro aleatï¿½rio entre 1 e 7
 	SELECT FLOOR(RAND()*(7-1+1))+1;
 
 */
 
-use bd_rede_postos
-
+use bd_rede_entregas
 
 create or alter function dbo.fn_aleatorio(@rand float, @maior_valor int, @menor_valor int =1)
 returns int 
@@ -72,7 +71,7 @@ begin
 			@MAX_VOLUME int
      
 	 create table #tb_volume_max (categoria varchar(100), volume int)
-	 insert into #tb_volume_max values('COMBUSTÍVEL',50)
+	 insert into #tb_volume_max values('COMBUSTï¿½VEL',50)
 	 insert into #tb_volume_max values ('LUBRIFICANTE', 5)
 
 	 -- Gerar codigos para as lojas
@@ -116,7 +115,7 @@ begin
 					     where id = (select dbo.fn_aleatorio(rand(), @MAX_PRODUTO,1))
 					    )
 
-	 -- Gerar códigos para o tipo de pagamento
+	 -- Gerar cï¿½digos para o tipo de pagamento
 
 	 create table #tb_tipo_pagamento (id int identity(1,1), cod_tipo_pagamento int)
 	 insert into #tb_tipo_pagamento select cod_tipo_pagamento from tb_tipo_pagamento
@@ -128,7 +127,7 @@ begin
 					 where id = (select dbo.fn_aleatorio(rand(), @MAX_TIPO_PAGAMENTO,1))
 					 )
 	 
-	 -- Gerar o volume de acordo com o volume máximo de cada categoria.
+	 -- Gerar o volume de acordo com o volume mï¿½ximo de cada categoria.
 
 	 set @MAX_VOLUME = (select volume from #tb_volume_max 
 	                    where categoria = @categoria)
@@ -167,7 +166,7 @@ begin
 	   print 'total venda combustivel:' + str(@total_vendas_dia_combustivel)
 	   while (@contador_vendas < @total_vendas_dia_combustivel)
 	      begin
-		     exec sp_insert_venda_produto @dt_inicial, 'COMBUSTÍVEL'
+		     exec sp_insert_venda_produto @dt_inicial, 'COMBUSTï¿½VEL'
 		     set @contador_vendas = @contador_vendas + 1
 		  end
 
