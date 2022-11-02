@@ -63,10 +63,10 @@ CREATE TABLE Dim_Bairro(
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	cod_bairro INT NOT NULL,
 	bairro VARCHAR(50) NOT NULL,
-	CEP CHAR(9) NOT NULL,
 	cod_cidade INT NOT NULL
 )
-CREATE INDEX IX_Dim_Bairro ON Dim_Bairro(cod_bairro)
+CREATE INDEX IX_Dim_Bairro_cod ON Dim_Bairro(cod_bairro)
+CREATE INDEX IX_Dim_Bairro_bairro ON Dim_Bairro(bairro)
 
 CREATE TABLE Dim_Tempo (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,

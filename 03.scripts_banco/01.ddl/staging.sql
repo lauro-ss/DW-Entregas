@@ -91,6 +91,5 @@ CREATE TABLE Aux_Bairro (
 	data_carga DATETIME NOT NULL,
 	cod_bairro INT NOT NULL,
 	bairro VARCHAR(50) NOT NULL,
-	CEP CHAR(9) NOT NULL,
 	cod_cidade INT NOT NULL,
 )
