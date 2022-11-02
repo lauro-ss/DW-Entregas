@@ -18,12 +18,14 @@ for i in range(len(linhas_municipio)):
         uf = str(linha_bairro[0])
         municipio = str(linha_bairro[1])
         bairro = str(linha_bairro[2])
+        bairro = bairro.replace("'", "''")
         if (linha_municipio[0] == uf and linha_municipio[1] == municipio):
             bairros_sql.write("INSERT INTO Bairro(bairro, idCidade)VALUES('" +
-                              linha_bairro[2] + "'" + "," + str(idCidade) + ")" + "\n")
+                              bairro + "'" + "," + str(idCidade) + ")" + "\n")
             aux = 0
     if (aux == 1):
         bairros_sql.write("INSERT INTO Bairro(bairro, idCidade)VALUES('" +
                           "Centro" + "'" + "," + str(idCidade) + ")" + "\n")
 
+bairros_sql.close()
 print("Terminou")
