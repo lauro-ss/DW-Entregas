@@ -1,3 +1,5 @@
+USE bd_rede_entregas
+
 INSERT INTO Regiao(regiao)VALUES('Sul')
 INSERT INTO Regiao(regiao)VALUES('Nordeste')
 INSERT INTO Regiao(regiao)VALUES('Norte')

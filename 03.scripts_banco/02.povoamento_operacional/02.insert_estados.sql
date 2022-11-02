@@ -1,3 +1,5 @@
+USE bd_rede_entregas
+
 INSERT INTO Estado(estado, UF, idRegiao)VALUES('Rondônia','RO',1)
 INSERT INTO Estado(estado, UF, idRegiao)VALUES('Acre','AC',1)
 INSERT INTO Estado(estado, UF, idRegiao)VALUES('Amazonas','AM',1)

@@ -1,3 +1,5 @@
+USE bd_rede_entregas
+
 INSERT INTO Bairro(bairro, idCidade)VALUES('Centro',1)
 INSERT INTO Bairro(bairro, idCidade)VALUES('Setor 02',2)
 INSERT INTO Bairro(bairro, idCidade)VALUES('Jardim Primavera',2)

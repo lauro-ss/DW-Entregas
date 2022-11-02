@@ -1,3 +1,5 @@
+USE bd_rede_entregas
+
 INSERT INTO Cidade(cidade, idEstado)VALUES('Alta Floresta D´oeste',1)
 INSERT INTO Cidade(cidade, idEstado)VALUES('Ariquemes',1)
 INSERT INTO Cidade(cidade, idEstado)VALUES('Cabixi',1)
