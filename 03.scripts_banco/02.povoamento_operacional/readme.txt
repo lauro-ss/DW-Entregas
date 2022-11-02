@@ -1,1 +1,7 @@
 -- Script para povoar o ambiente Operacional
+-- Executar scrips na sequência
+-- insert_regioes
+-- insert_estados
+-- insert_municipios
+-- insert_bairros
+-- sp_povoar_operacional
