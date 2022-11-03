@@ -66,7 +66,7 @@ CREATE TABLE Endereco (
 	rua VARCHAR(75) NOT NULL,
 	numero CHAR(5) NOT NULL,
 	CEP CHAR(9) NOT NULL,
-	complemento VARCHAR(100) NOT NULL,
+	complemento VARCHAR(100) NULL,
 	idBairro INT NOT NULL
 
 	CONSTRAINT FK_idBairro FOREIGN KEY (idBairro) REFERENCES Bairro (id)
