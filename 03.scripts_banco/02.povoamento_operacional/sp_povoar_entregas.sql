@@ -42,7 +42,51 @@
 
 */
 
-use bd_rede_entregas
+USE bd_rede_entregas
+
+CREATE OR ALTER FUNCTION dbo.dif_dias(@DATA_INICIO DATETIME, @DATA_FIM DATETIME)
+RETURNS INT
+AS
+BEGIN
+	set language Brazilian
+	DECLARE @DIAS INT
+	SET @DIAS = 0
+	WHILE(@DATA_INICIO <= @DATA_FIM)
+	BEGIN
+		IF(DATENAME(dw,@DATA_INICIO) NOT IN ('Sábado','Domingo'))
+		BEGIN
+			SET @DATA_INICIO = DATEADD(dd,1,@DATA_INICIO)
+			SET @DIAS = @DIAS + 1
+		END
+	END
+	RETURN @DIAS
+END
+
+CREATE OR ALTER PROCEDURE SP_POVOAR_ENTREGAS(@DATA DATETIME)
+AS
+BEGIN
+	DECLARE @id_ENDERECO INT
+	DECLARE C_ENDERECO CURSOR FOR SELECT ID FROM ENDERECO
+	OPEN C_ENDERECO
+	FETCH C_ENDERECO INTO @id_ENDERECO
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		INSERT INTO Entrega(diasEstimados, 
+							diasNecessarios, 
+							dataSaida,
+							dataEntrega,
+							foraDoPrazo,
+							frete,
+							idOrigem,
+							idDestino,
+							idStatus,
+							idModalidade)
+		SELECT * FROM ENTREGA
+		FETCH C_ENDERECO INTO @id_ENDERECO
+	END
+	CLOSE C_ENDERECO
+	DEALLOCATE C_ENDERECO
+END
 
 create or alter function dbo.fn_aleatorio(@rand float, @maior_valor int, @menor_valor int =1)
 returns int 
