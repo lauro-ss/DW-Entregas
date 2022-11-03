@@ -6,10 +6,7 @@ DROP TABLE IF EXISTS Fato_Entrega
 DROP TABLE IF EXISTS Dim_Status
 DROP TABLE IF EXISTS Dim_Modalidade
 DROP TABLE IF EXISTS Dim_Transportadora
-DROP TABLE IF EXISTS Dim_Regiao
-DROP TABLE IF EXISTS Dim_Estado
-DROP TABLE IF EXISTS Dim_Cidade
-DROP TABLE IF EXISTS Dim_Bairro
+DROP TABLE IF EXISTS Dim_Localidade
 DROP TABLE IF EXISTS Dim_Tempo
 
 CREATE TABLE Dim_Status (
@@ -35,38 +32,22 @@ CREATE TABLE Dim_Transportadora (
 )
 CREATE INDEX IX_Dim_Transportadora ON Dim_Transportadora(cod_transportadora)
 
-CREATE TABLE Dim_Regiao (
+CREATE TABLE Dim_Localidade (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	cod_regiao INT NOT NULL,
-	regiao CHAR(12) NOT NULL
-)
-CREATE INDEX IX_Dim_Regiao ON Dim_Regiao(cod_regiao)
-
-CREATE TABLE Dim_Estado (
-	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	regiao CHAR(12) NOT NULL,
 	cod_estado INT NOT NULL,
 	estado VARCHAR(45) NOT NULL,
 	UF CHAR(2) NOT NULl,
-	cod_regiao INT NOT NULL
-)
-CREATE INDEX IX_Dim_Estado ON Dim_Estado(cod_estado)
-
-CREATE TABLE Dim_Cidade (
-	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	cod_cidade INT NOT NULL,
 	cidade VARCHAR(50) NOT NULL,
-	cod_estado INT NOT NULL
-)
-CREATE INDEX IX_Dim_Cidade ON Dim_Cidade(cod_cidade)
-
-CREATE TABLE Dim_Bairro(
-	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	cod_bairro INT NOT NULL,
-	bairro VARCHAR(50) NOT NULL,
-	cod_cidade INT NOT NULL
+	bairro VARCHAR(50) NOT NULL
 )
-CREATE INDEX IX_Dim_Bairro_cod ON Dim_Bairro(cod_bairro)
-CREATE INDEX IX_Dim_Bairro_bairro ON Dim_Bairro(bairro)
+CREATE INDEX IX_Dim_Localidade_Regiao ON Dim_Localidade(cod_regiao)
+CREATE INDEX IX_Dim_Localidade_Estado ON Dim_Localidade(cod_estado)
+CREATE INDEX IX_Dim_Localidade_Cidade ON Dim_Localidade(cod_cidade)
+CREATE INDEX IX_Dim_Localidade_Bairro ON Dim_Localidade(cod_bairro)
 
 CREATE TABLE Dim_Tempo (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
@@ -91,10 +72,8 @@ CREATE TABLE Fato_Entrega (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	data_saida BIGINT NOT NULL,
 	data_entrega BIGINT NULL,
-	regiao INT NOT NULL,
-	estado INT NOT NULL,
-	cidade INT NOT NULL,
-	bairro INT NOT NULL,
+	origem INT NOT NULL,
+	destino INT NULL,
 	status INT NOT NULL,
 	modalidade INT NOT NULL,
 	transportadora INT NOT NULL,
@@ -108,20 +87,16 @@ CREATE TABLE Fato_Entrega (
 	CONSTRAINT FK_Dim_Status FOREIGN KEY (status) REFERENCES Dim_Status (id),
 	CONSTRAINT FK_Dim_Modalidade FOREIGN KEY (modalidade) REFERENCES Dim_Modalidade(id),
 	CONSTRAINT FK_Dim_Transportadora FOREIGN KEY (transportadora) REFERENCES Dim_Transportadora (id),
-	CONSTRAINT FK_Dim_Regiao FOREIGN KEY (regiao) REFERENCES Dim_Regiao (id),
-	CONSTRAINT FK_Dim_Estado FOREIGN KEY (estado) REFERENCES Dim_Estado (id),
-	CONSTRAINT FK_Dim_Cidade FOREIGN KEY (cidade) REFERENCES Dim_Cidade (id),
-	CONSTRAINT FK_Dim_Bairro FOREIGN KEY (bairro) REFERENCES Dim_Bairro (id),
+	CONSTRAINT FK_Dim_Localidade_origem FOREIGN KEY (origem) REFERENCES Dim_Localidade (id),
+	CONSTRAINT FK_Dim_Localidade_destino FOREIGN KEY (destino) REFERENCES Dim_Localidade (id),
 	CONSTRAINT FK_data_saida FOREIGN KEY (data_saida) REFERENCES Dim_Tempo (id),
 	CONSTRAINT FK_data_entrega FOREIGN KEY (data_entrega) REFERENCES Dim_Tempo (id)
 )
 
 CREATE INDEX IX_FATO_data_saida ON Fato_Entrega(data_saida)
 CREATE INDEX IX_FATO_data_entrega ON Fato_Entrega(data_entrega)
-CREATE INDEX IX_FATO_regiao ON Fato_Entrega(regiao)
-CREATE INDEX IX_FATO_estado ON Fato_Entrega(estado)
-CREATE INDEX IX_FATO_cidade ON Fato_Entrega(cidade)
-CREATE INDEX IX_FATO_bairro ON Fato_Entrega(bairro)
+CREATE INDEX IX_FATO_origem ON Fato_Entrega(origem)
+CREATE INDEX IX_FATO_destino ON Fato_Entrega(destino)
 CREATE INDEX IX_FATO_status ON Fato_Entrega(status)
 CREATE INDEX IX_FATO_modalidade ON Fato_Entrega(modalidade)
 CREATE INDEX IX_FATO_transportadora ON Fato_Entrega(transportadora)

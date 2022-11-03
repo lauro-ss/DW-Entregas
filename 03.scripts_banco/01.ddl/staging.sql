@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS Vio_Entrega
 DROP TABLE IF EXISTS Aux_Status
 DROP TABLE IF EXISTS Aux_Transportadora
 DROP TABLE IF EXISTS Aux_Modalidade
+DROP TABLE IF EXISTS Aux_Localidade
 DROP TABLE IF EXISTS Aux_Regiao
 DROP TABLE IF EXISTS Aux_Estado
 DROP TABLE IF EXISTS Aux_Cidade
@@ -28,6 +29,8 @@ CREATE TABLE Aux_Entrega (
 	cod_modalidade INT NOT NULL,
 )
 
+CREATE INDEX IX_Aux_Entrega ON Aux_Entrega(data_carga)
+
 CREATE TABLE Vio_Entrega (
 	id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	data_carga DATETIME NOT NULL,
@@ -46,11 +49,15 @@ CREATE TABLE Vio_Entrega (
 	violacao VARCHAR(150) NOT NULL
 )
 
+CREATE INDEX IX_Vio_Entrega ON Vio_Entrega(data_carga)
+
 CREATE TABLE Aux_Status (
 	data_carga DATETIME NOT NULL,
 	cod_status INT NOT NULL,
 	status VARCHAR(15) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
 )
+
+CREATE INDEX IX_Aux_Status ON Aux_Status(data_carga)
 
 CREATE TABLE Aux_Transportadora (
 	data_carga DATETIME NOT NULL,
@@ -59,6 +66,8 @@ CREATE TABLE Aux_Transportadora (
 	CNPJ CHAR(20) NOT NULL
 )
 
+CREATE INDEX IX_Aux_Transportadora ON Aux_Transportadora(data_carga)
+
 CREATE TABLE Aux_Modalidade (
 	data_carga DATETIME NOT NULL,
 	cod_modalidade INT NOT NULL,
@@ -66,30 +75,19 @@ CREATE TABLE Aux_Modalidade (
 	cod_transportadora INT NOT NULL,
 )
 
-CREATE TABLE Aux_Regiao (
+CREATE INDEX IX_Aux_Modalidade ON Aux_Modalidade(data_carga)
+
+CREATE TABLE Aux_Localidade (
 	data_carga DATETIME NOT NULL,
 	cod_regiao INT NOT NULL,
 	regiao CHAR(12) NOT NULL,
-)
-
-CREATE TABLE Aux_Estado (
-	data_carga DATETIME NOT NULL,
 	cod_estado INT NOT NULL,
 	estado VARCHAR(45) NOT NULL,
 	UF CHAR(2) NOT NULL,
-	cod_regiao INT NOT NULL,
-)
-
-CREATE TABLE Aux_Cidade (
-	data_carga DATETIME NOT NULL,
 	cod_cidade INT NOT NULL,
 	cidade VARCHAR(50) NOT NULL,
-	cod_estado INT NOT NULL,
+	cod_bairro INT NOT NULL,
+	bairro VARCHAR(50) NOT NULL
 )
 
-CREATE TABLE Aux_Bairro (
-	data_carga DATETIME NOT NULL,
-	cod_bairro INT NOT NULL,
-	bairro VARCHAR(50) NOT NULL,
-	cod_cidade INT NOT NULL,
-)
+CREATE INDEX IX_Aux_Localidade ON Aux_Localidade(data_carga)
