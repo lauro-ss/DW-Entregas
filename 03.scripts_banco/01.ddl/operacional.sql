@@ -28,8 +28,14 @@ CREATE TABLE Modalidade (
 
 CREATE TABLE Status (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-	status VARCHAR(15) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
+	status VARCHAR(16) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
 )
+
+INSERT INTO Status (status) VALUES('Entregue')
+INSERT INTO Status (status) VALUES('Em transporte')
+INSERT INTO Status (status) VALUES('Extraviado')
+INSERT INTO Status (status) VALUES('Em processamento')
+INSERT INTO Status (status) VALUES('Devolvido')
 
 CREATE TABLE Regiao (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
