@@ -95,10 +95,10 @@ CREATE TABLE Endereco (
 CREATE TABLE Entrega (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	diasEstimados INT NOT NULL,
-	diasNecessarios INT NOT NULL,
+	diasNecessarios INT NULL,
 	dataSaida DATETIME NOT NULL,
-	dataEntrega DATETIME NOT NULL,
-	foraDoPrazo CHAR(3) NOT NULL CHECK(foraDoPrazo IN ('SIM','NAO')),
+	dataEntrega DATETIME NULL,
+	foraDoPrazo CHAR(3) NULL CHECK(foraDoPrazo IN ('SIM','NAO')),
 	frete NUMERIC(10,2) NOT NULL,
 	idOrigem INT NOT NULL,
 	idDestino INT NOT NULL,
