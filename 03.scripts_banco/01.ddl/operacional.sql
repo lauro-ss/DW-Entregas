@@ -18,6 +18,11 @@ CREATE TABLE Transportadora (
 	CNPJ CHAR(20) NOT NULL
 )
 
+INSERT INTO Transportadora(transportadora, CNPJ) VALUES ('Correios', '34.028.316/0001-03')
+INSERT INTO Transportadora(transportadora, CNPJ) VALUES ('Latam Cargo', '02.012.862/0148-96')
+INSERT INTO Transportadora(transportadora, CNPJ) VALUES ('Jadlog', '04.884.082/0001-35')
+INSERT INTO Transportadora(transportadora, CNPJ) VALUES ('Azul Cargo Express', '28.869.872/0001-00')
+
 CREATE TABLE Modalidade (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	modalidade VARCHAR(30) NOT NULL,
@@ -25,6 +30,15 @@ CREATE TABLE Modalidade (
 
 	CONSTRAINT FK_idTransportadora FOREIGN KEY (idTransportadora) REFERENCES Transportadora (id)
 )
+
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('PAC',1)
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('SEDEX',1)
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('Mini Envios',1)
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('éFácil',2)
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('.Package',3)
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('.Com',3)
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('e-commerce',4)
+INSERT INTO Modalidade(modalidade, idTransportadora) VALUES ('Amanhã',4)
 
 CREATE TABLE Status (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
