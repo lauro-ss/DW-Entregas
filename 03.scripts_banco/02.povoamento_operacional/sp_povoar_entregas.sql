@@ -1,107 +1,109 @@
--- Scripts para povoar o ambiente operacional
-
-/*
-   sp_povar_vendas
-
-   A ideia desse procedimento � gerar vendas
-   entre duas datas de maneira aleat�ria.
-
-   A ideia geral � fazer um loop inicial entre a data inicial
-   e data final passadas como par�metro.
-
-   Dentro desse loop, vamos fazer um outro loop com uma quantidade 
-   de vendas aleat�ria para cada dia e incluir tamb�m vendas
-   como valores aleat�rios para tipo de pagamento, codigo da loja,
-   codigo do produto, etc.
-
-   Como o objetivo de deixar a coisa um pouco mais real, foram
-   criados dois loops: Um para combust�vel e outro para lubrificantes uma
-   vez que o volume vendido de combust�vel � bem diferente do volume
-   vendido de lubrificante.
-
-   Para conseguir gerar os n�meros aleat�rios,
-   podemos utilizar as seguinte express�es em T-SQL:
-
-   Para n�meros decimais:
-   SELECT RAND()*(b-a)+a;
-   Onde b � o maior n�mero
-   e a � o menor n�mero
-
-   Para n�meros inteiros:
-   SELECT FLOOR(RAND()*(b-a+1))+a;
-   Onde b � o maior n�mero
-   e a � o menor n�mero
-
-    Exemplos: 
-
-	Gerar um valor decimal aleat�rio entre 10.0 e 100.0
-	SELECT RAND()*(100-10)+10;
-
-	Gerar um valor inteiro aleat�rio entre 1 e 7
-	SELECT FLOOR(RAND()*(7-1+1))+1;
-
-*/
-
 USE bd_rede_entregas
 
-CREATE OR ALTER FUNCTION dbo.dif_dias(@DATA_INICIO DATETIME, @DATA_FIM DATETIME)
-RETURNS INT
+CREATE OR ALTER FUNCTION dbo.dif_dias(@DATA_INICIO DATETIME, @DIAS INT)
+RETURNS DATETIME
 AS
 BEGIN
-	DECLARE @DIAS INT
-	SET @DIAS = 0
-	WHILE(@DATA_INICIO <= @DATA_FIM)
+	DECLARE @DATA_FIM DATETIME
+	DECLARE @I INT
+	SET @I = 0
+	SET @DATA_FIM = @DATA_INICIO
+	WHILE(@I < @DIAS)
 	BEGIN
-		IF(DATENAME(dw,@DATA_INICIO) NOT IN ('Sábado','Domingo'))
+		IF(DATENAME(dw,@DATA_FIM) = 'Sábado')
 		BEGIN
-			SET @DIAS = @DIAS + 1
+			SET @DATA_FIM = DATEADD(dd,2,@DATA_FIM)
 		END
-		SET @DATA_INICIO = DATEADD(dd,1,@DATA_INICIO)
+		IF(DATENAME(dw,@DATA_FIM) = 'Domingo')
+		BEGIN
+			SET @DATA_FIM = DATEADD(dd,1,@DATA_FIM)
+		END
+			SET @DATA_FIM = DATEADD(dd,1,@DATA_FIM)
+			SET @I = @I + 1
 	END
-	RETURN @DIAS
+	RETURN @DATA_FIM
 END
 
-set language Brazilian
-SELECT dbo.dif_dias('20221103','20221107')
 
-CREATE OR ALTER FUNCTION dbo.aleatorio(@RAND FLOAT, @MAIOR INT)
+CREATE OR ALTER FUNCTION dbo.aleatorio(@RAND FLOAT, @MAIOR INT, @MENOR INT)
 RETURNS INT
 AS
 BEGIN
-    RETURN (SELECT FLOOR(@RAND*(@MAIOR-1+1)+1))
+    RETURN (SELECT FLOOR(@RAND*(@MAIOR-@MENOR+1)+@MENOR))
 END
 
-SELECT dbo.aleatorio(RAND(), 5)
-
-CREATE OR ALTER FUNCTION dbo.ex_aleatorio(@RAND FLOAT, @MAIOR INT, @EX INT)
+CREATE OR ALTER FUNCTION dbo.ex_aleatorio(@RAND FLOAT, @MAIOR INT, @MENOR INT, @EX INT)
 RETURNS INT
 AS
 BEGIN
 	DECLARE @ALE INT, @CONT INT
-	SET @ALE = (SELECT FLOOR(@RAND*(@MAIOR-1+1)+1))
+	SET @ALE = (SELECT FLOOR(@RAND*(@MAIOR-@MENOR+1)+@MENOR))
 	SET @CONT = 0
 	WHILE(@ALE = @EX)
 	BEGIN
-		SET @ALE = (SELECT FLOOR(@RAND*(@MAIOR-1+1)+1))
+		SET @ALE = (SELECT FLOOR(@RAND*(@MAIOR-@MENOR+1)+@MENOR))
 		IF(@CONT = 10)
 			SET @ALE = @EX + 1
 		SET @CONT = @CONT + 1
 	END
     RETURN @ALE
 END
--- Aleatorio de 1 a 5 exceto 2
-SELECT dbo.ex_aleatorio(RAND(), 5, 7)
+
+CREATE OR ALTER FUNCTION dbo.calcula_frete(@DIAS INT)
+RETURNS NUMERIC(10,2)
+AS
+BEGIN
+	RETURN IIF(@DIAS >= 12, 5 * (@DIAS * 0.8), (10 * (@DIAS * 0.1))+(5 * 10))
+END
+
+-- VERIFICA A DATA PARA QUE NAO EXISTA ENTREGAS COM DATA DE ORIGEM
+-- EM FINAIS DE SEMANA
+CREATE OR ALTER FUNCTION dbo.verifica_data(@DATA DATETIME)
+RETURNS DATETIME
+AS
+BEGIN
+	IF(DATENAME(dw,@DATA) = 'Sábado')
+	BEGIN
+		SET @DATA= DATEADD(dd,2,@DATA)
+	END
+	IF(DATENAME(dw,@DATA) = 'Domingo')
+	BEGIN
+		SET @DATA = DATEADD(dd,1,@DATA)
+	END
+
+	RETURN @DATA
+END
 
 CREATE OR ALTER PROCEDURE SP_POVOAR_ENTREGAS(@DATA DATETIME)
 AS
 BEGIN
+	set language Brazilian
+	DECLARE @diasEstimados INT, @diasNecessarios INT, @dataSaida DATETIME,
+	@dataEntrega DATETIME, @foraDoPrazo CHAR(3), @frete NUMERIC(10,2), @idStatus INT
+
+	DECLARE @TOTAL_END BIGINT
+	SET @TOTAL_END = (SELECT COUNT(ID) FROM Endereco)
+
+	DECLARE @CONT_DIAS INT
+	SET @CONT_DIAS = 0
+
 	DECLARE @id_ENDERECO INT
 	DECLARE C_ENDERECO CURSOR FOR SELECT ID FROM ENDERECO
 	OPEN C_ENDERECO
 	FETCH C_ENDERECO INTO @id_ENDERECO
 	WHILE(@@FETCH_STATUS = 0)
 	BEGIN
-		INSERT INTO Entrega(diasEstimados, 
+		SET @idStatus = dbo.aleatorio(RAND(), 5, 1)
+		-- ENTREGUE
+		IF @idStatus = 1
+		BEGIN
+			SET @diasEstimados = dbo.aleatorio(RAND(), 15, 7)
+			SET @diasNecessarios = dbo.aleatorio(RAND(), 17, 5)
+			SET @dataSaida = dbo.verifica_data(@DATA)
+			SET @dataEntrega = dbo.dif_dias(@dataSaida, @diasNecessarios)
+			SET @foraDoPrazo = IIF(@diasNecessarios > @diasEstimados, 'SIM', 'NAO')
+			SET @frete = dbo.calcula_frete(@diasEstimados)
+			INSERT INTO Entrega(diasEstimados, 
 							diasNecessarios, 
 							dataSaida,
 							dataEntrega,
@@ -111,160 +113,154 @@ BEGIN
 							idDestino,
 							idStatus,
 							idModalidade)
-		SELECT * FROM ENTREGA
+			VALUES (@diasEstimados,
+					@diasNecessarios,
+					@dataSaida,
+					@dataEntrega,
+					@foraDoPrazo,
+					@frete,
+					@id_ENDERECO,
+					dbo.ex_aleatorio(RAND(), @TOTAL_END, 1, @id_ENDERECO),
+					@idStatus,
+					dbo.aleatorio(RAND(), 8, 1))
+		END
+		-- EM TRANSPORTE
+		IF @idStatus = 2
+		BEGIN
+			SET @diasEstimados = dbo.aleatorio(RAND(), 15, 7)
+			SET @diasNecessarios = null
+			SET @dataSaida = dbo.verifica_data(@DATA)
+			SET @dataEntrega = null
+			SET @foraDoPrazo = null
+			SET @frete = dbo.calcula_frete(@diasEstimados)
+			INSERT INTO Entrega(diasEstimados, 
+							diasNecessarios, 
+							dataSaida,
+							dataEntrega,
+							foraDoPrazo,
+							frete,
+							idOrigem,
+							idDestino,
+							idStatus,
+							idModalidade)
+			VALUES (@diasEstimados,
+					@diasNecessarios,
+					@dataSaida,
+					@dataEntrega,
+					@foraDoPrazo,
+					@frete,
+					@id_ENDERECO,
+					dbo.ex_aleatorio(RAND(), @TOTAL_END, 1, @id_ENDERECO),
+					@idStatus,
+					dbo.aleatorio(RAND(), 8, 1))
+		END
+		-- EXTRAVIADO
+		IF @idStatus = 3
+		BEGIN
+			SET @diasEstimados = dbo.aleatorio(RAND(), 15, 7)
+			SET @diasNecessarios = null
+			SET @dataSaida = dbo.verifica_data(@DATA)
+			SET @dataEntrega = null
+			SET @foraDoPrazo = null
+			SET @frete = dbo.calcula_frete(@diasEstimados)
+			INSERT INTO Entrega(diasEstimados, 
+							diasNecessarios, 
+							dataSaida,
+							dataEntrega,
+							foraDoPrazo,
+							frete,
+							idOrigem,
+							idDestino,
+							idStatus,
+							idModalidade)
+			VALUES (@diasEstimados,
+					@diasNecessarios,
+					@dataSaida,
+					@dataEntrega,
+					@foraDoPrazo,
+					@frete,
+					@id_ENDERECO,
+					dbo.ex_aleatorio(RAND(), @TOTAL_END, 1, @id_ENDERECO),
+					@idStatus,
+					dbo.aleatorio(RAND(), 8, 1))
+		END
+		-- EM PROCESSAMENTO
+		IF @idStatus = 4
+		BEGIN
+			SET @diasEstimados = dbo.aleatorio(RAND(), 15, 7)
+			SET @diasNecessarios = null
+			SET @dataSaida = dbo.verifica_data(@DATA)
+			SET @dataEntrega = null
+			SET @foraDoPrazo = null
+			SET @frete = dbo.calcula_frete(@diasEstimados)
+			INSERT INTO Entrega(diasEstimados, 
+							diasNecessarios, 
+							dataSaida,
+							dataEntrega,
+							foraDoPrazo,
+							frete,
+							idOrigem,
+							idDestino,
+							idStatus,
+							idModalidade)
+			VALUES (@diasEstimados,
+					@diasNecessarios,
+					@dataSaida,
+					@dataEntrega,
+					@foraDoPrazo,
+					@frete,
+					@id_ENDERECO,
+					dbo.ex_aleatorio(RAND(), @TOTAL_END, 1, @id_ENDERECO),
+					@idStatus,
+					dbo.aleatorio(RAND(), 8, 1))
+		END
+		-- DEVOLVIDO
+		IF @idStatus = 5
+		BEGIN
+			SET @diasEstimados = dbo.aleatorio(RAND(), 15, 7)
+			SET @diasNecessarios = dbo.aleatorio(RAND(), 17, 5)
+			SET @dataSaida = dbo.verifica_data(@DATA)
+			SET @dataEntrega = dbo.dif_dias(@dataSaida, @diasNecessarios)
+			SET @foraDoPrazo = IIF(@diasNecessarios > @diasEstimados, 'SIM', 'NAO')
+			SET @frete = dbo.calcula_frete(@diasEstimados)
+			INSERT INTO Entrega(diasEstimados, 
+							diasNecessarios, 
+							dataSaida,
+							dataEntrega,
+							foraDoPrazo,
+							frete,
+							idOrigem,
+							idDestino,
+							idStatus,
+							idModalidade)
+			VALUES (@diasEstimados,
+					@diasNecessarios,
+					@dataSaida,
+					@dataEntrega,
+					@foraDoPrazo,
+					@frete,
+					@id_ENDERECO,
+					dbo.ex_aleatorio(RAND(), @TOTAL_END, 1, @id_ENDERECO),
+					@idStatus,
+					dbo.aleatorio(RAND(), 8, 1))
+		END
+		
+		-- 1000 ENTREGAS POR DIA
+		IF(@CONT_DIAS = 1000)
+		BEGIN
+			SET @DATA = DATEADD(dd,1,@DATA)
+			SET @CONT_DIAS = 0
+		END
+
+		SET @CONT_DIAS = @CONT_DIAS + 1
 		FETCH C_ENDERECO INTO @id_ENDERECO
 	END
 	CLOSE C_ENDERECO
 	DEALLOCATE C_ENDERECO
 END
 
-create or alter function dbo.fn_aleatorio(@rand float, @maior_valor int, @menor_valor int =1)
-returns int 
-as
-begin
-    return (SELECT FLOOR(@rand*(@maior_valor-@menor_valor+1))+@menor_valor);
-end
+EXEC SP_POVOAR_ENTREGAS '20221001'
 
-
-create or alter procedure sp_insert_venda_produto(@data datetime,
-                                                  @categoria varchar(100))
-as
-begin
-    set nocount on
-    declare @cod_loja int,
-	        @cod_funcionario int,
-	        @cod_produto int,
-			@cod_tipo_pagamento int,
-			@volume numeric(10,2),
-			@valor numeric(10,2),
-
-			@MAX_LOJA int,
-			@MAX_FUNCIONARIO int,
-			@MAX_PRODUTO int,
-			@MAX_TIPO_PAGAMENTO int,
-			@MAX_VOLUME int
-     
-	 create table #tb_volume_max (categoria varchar(100), volume int)
-	 insert into #tb_volume_max values('COMBUST�VEL',50)
-	 insert into #tb_volume_max values ('LUBRIFICANTE', 5)
-
-	 -- Gerar codigos para as lojas
-
-	 create table #tb_loja (id int identity(1,1), cod_loja int)
-	 insert into #tb_loja select cod_loja from tb_loja
-	 set @MAX_LOJA = (select count(*) from #tb_loja)
-
-
-	 set @cod_loja = (select cod_loja 
-	                 from #tb_loja
-					 where id = (select dbo.fn_aleatorio(rand(), @MAX_LOJA,1))
-					 )
-	 
-	 -- Gerar codigos de funcionarios de acordo com a loja
-	 create table #tb_funcionario (id int identity(1,1), cod_funcionario int)
-	 insert into #tb_funcionario select cod_funcionario 
-	                             from tb_loja_funcionario    
-								 where cod_loja = @cod_loja
-
-     set @MAX_FUNCIONARIO = (select count(*) from #tb_funcionario)
-
-	 set @cod_funcionario = (select cod_funcionario
-	                         from #tb_funcionario
-					         where id = (select dbo.fn_aleatorio(rand(), @MAX_FUNCIONARIO,1))
-					        )
-	 
-	 -- Gerar codigos para os produtos 
-	 create table #tb_produto (id int identity(1,1), cod_produto int)
-	 insert into #tb_produto select p.cod_produto from tb_produto p
-	                         inner join tb_subcategoria s 
-							 on (p.cod_subcategoria = s.cod_subcategoria)
-							 inner join tb_categoria c
-							 on (s.cod_categoria = c.cod_categoria)
-							 where c.categoria = @categoria
-     
-	 set @MAX_PRODUTO = (select count(*) from #tb_produto)
-
-	 set @cod_produto = (select cod_produto
-	                     from #tb_produto
-					     where id = (select dbo.fn_aleatorio(rand(), @MAX_PRODUTO,1))
-					    )
-
-	 -- Gerar c�digos para o tipo de pagamento
-
-	 create table #tb_tipo_pagamento (id int identity(1,1), cod_tipo_pagamento int)
-	 insert into #tb_tipo_pagamento select cod_tipo_pagamento from tb_tipo_pagamento
-	 set @MAX_TIPO_PAGAMENTO = (select count(*) from #tb_tipo_pagamento)
-
-
-	 set @cod_tipo_pagamento = (select cod_tipo_pagamento 
-	                 from #tb_tipo_pagamento
-					 where id = (select dbo.fn_aleatorio(rand(), @MAX_TIPO_PAGAMENTO,1))
-					 )
-	 
-	 -- Gerar o volume de acordo com o volume m�ximo de cada categoria.
-
-	 set @MAX_VOLUME = (select volume from #tb_volume_max 
-	                    where categoria = @categoria)
-
-
-	 set @volume = (select dbo.fn_aleatorio(rand(), @MAX_VOLUME,1))
-
-
-	 set @valor = @volume * (select valor from tb_produto 
-	                         where cod_produto = @cod_produto)
-	 insert into tb_venda
-	 values(@cod_loja, @cod_funcionario, @cod_produto, @cod_tipo_pagamento,
-	        @data, @volume, @valor)
-end
-
-create or alter procedure sp_povoar_vendas (@dt_inicial datetime, @dt_final datetime)
-as
-begin
-    set nocount on
-    declare @max_vendas_combustivel int = 3000, 
-	        @min_vendas_combustivel int = 2000,
-	        @max_vendas_lubrificante int = 200,
-			@min_vendas_lubrificante int = 60,
-			@total_vendas_dia_combustivel int,
-			@total_vendas_dia_lubrificantes int,
-			@contador_vendas int = 0,
-			@semente float
-			
-    select @semente = rand(10)
-	while (@dt_inicial < @dt_final)
-	begin
-	   
-	   set @total_vendas_dia_combustivel = 
-	               (select dbo.fn_aleatorio(rand(), @max_vendas_combustivel,@min_vendas_combustivel))
-	   set @contador_vendas = 0
-	   print 'total venda combustivel:' + str(@total_vendas_dia_combustivel)
-	   while (@contador_vendas < @total_vendas_dia_combustivel)
-	      begin
-		     exec sp_insert_venda_produto @dt_inicial, 'COMBUST�VEL'
-		     set @contador_vendas = @contador_vendas + 1
-		  end
-
-
-	   set @total_vendas_dia_lubrificantes = 
-	                      (select dbo.fn_aleatorio(rand(), @max_vendas_lubrificante,@min_vendas_lubrificante))
-	   set @contador_vendas = 0
-	   print 'total venda lubrificante:' + str(@total_vendas_dia_lubrificantes)
-	   while (@contador_vendas < @total_vendas_dia_lubrificantes)
-	      begin
-		     exec sp_insert_venda_produto @dt_inicial, 'LUBRIFICANTE'
-		     set @contador_vendas = @contador_vendas + 1
-		  end
-	   
-	   set @dt_inicial = @dt_inicial + 1
-	end 
-end
-
-
-exec sp_povoar_vendas '20210101', '20210103'
-
-
-select count(*) from tb_venda
-
-truncate table tb_venda
+SELECT TOP 10 dataSaida FROM Entrega
 
 
