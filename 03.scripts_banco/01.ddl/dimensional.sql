@@ -77,12 +77,12 @@ CREATE TABLE Fato_Entrega (
 	status INT NOT NULL,
 	modalidade INT NOT NULL,
 	transportadora INT NOT NULL,
-	frete NUMERIC(10,2),
+	frete NUMERIC(10,2) NULL,
 	diasEstimados INT NOT NULL,
-	diasNecessarios INT NOT NULL,
+	diasNecessarios INT NULL,
 	cod_entrega BIGINT NOT NULL,
 	quantidade INT NOT NULL DEFAULT (1),
-	foraDoPrazo CHAR(3) NOT NULL CHECK(foraDoPrazo IN ('SIM','NAO'))
+	foraDoPrazo CHAR(3) NULL CHECK(foraDoPrazo IN ('SIM','NAO'))
 
 	CONSTRAINT FK_Dim_Status FOREIGN KEY (status) REFERENCES Dim_Status (id),
 	CONSTRAINT FK_Dim_Modalidade FOREIGN KEY (modalidade) REFERENCES Dim_Modalidade(id),
