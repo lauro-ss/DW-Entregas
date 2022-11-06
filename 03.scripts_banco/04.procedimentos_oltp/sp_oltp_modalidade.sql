@@ -1,0 +1,9 @@
+USE bd_rede_entregas
+
+CREATE OR ALTER PROCEDURE SP_OLTP_MODALIDADE (@DATA_CARGA DATETIME) AS
+BEGIN
+	DELETE Aux_Modalidade WHERE DATA_CARGA = @DATA_CARGA
+
+	INSERT INTO Aux_Modalidade
+	SELECT @DATA_CARGA, M.id, M.modalidade, M.idTransportadora FROM Modalidade M
+END

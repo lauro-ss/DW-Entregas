@@ -1,0 +1,9 @@
+USE bd_rede_entregas
+
+CREATE OR ALTER PROCEDURE SP_OLTP_TRANSPORTADORA (@DATA_CARGA DATETIME) AS
+BEGIN
+	DELETE Aux_Transportadora WHERE DATA_CARGA = @DATA_CARGA
+
+	INSERT INTO Aux_Transportadora
+	SELECT @DATA_CARGA, T.id, T.transportadora, T.CNPJ FROM Transportadora T
+END
