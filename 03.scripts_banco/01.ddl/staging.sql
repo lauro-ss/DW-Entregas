@@ -51,7 +51,7 @@ CREATE INDEX IX_Vio_Entrega ON Vio_Entrega(data_carga)
 CREATE TABLE Aux_Status (
 	data_carga DATETIME NOT NULL,
 	cod_status INT NOT NULL,
-	status VARCHAR(15) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
+	status VARCHAR(16) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
 )
 
 CREATE INDEX IX_Aux_Status ON Aux_Status(data_carga)
@@ -84,7 +84,7 @@ CREATE TABLE Aux_Localidade (
 	cod_cidade INT NOT NULL,
 	cidade VARCHAR(50) NOT NULL,
 	cod_bairro INT NOT NULL,
-	bairro VARCHAR(50) NOT NULL
+	bairro VARCHAR(100) NOT NULL
 )
 
 CREATE INDEX IX_Aux_Localidade ON Aux_Localidade(data_carga)

@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS Dim_Tempo
 CREATE TABLE Dim_Status (
 	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	cod_status INT NOT NULL,
-	status VARCHAR(15) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
+	status VARCHAR(16) NOT NULL CHECK(status IN ('Entregue','Em transporte','Extraviado','Em processamento','Devolvido'))
 )
 CREATE INDEX IX_Dim_Status ON Dim_Status(cod_status)
 
@@ -42,7 +42,7 @@ CREATE TABLE Dim_Localidade (
 	cod_cidade INT NOT NULL,
 	cidade VARCHAR(50) NOT NULL,
 	cod_bairro INT NOT NULL,
-	bairro VARCHAR(50) NOT NULL
+	bairro VARCHAR(100) NOT NULL
 )
 CREATE INDEX IX_Dim_Localidade_Regiao ON Dim_Localidade(cod_regiao)
 CREATE INDEX IX_Dim_Localidade_Estado ON Dim_Localidade(cod_estado)
