@@ -25,6 +25,7 @@ BEGIN
 			UPDATE Dim_Localidade SET cod_regiao = @COD_REGIAO, regiao = @REGIAO, cod_estado = @COD_ESTADO,
 			estado = @ESTADO, UF = @UF, cod_cidade = @COD_CIDADE, cidade = @CIDADE, cod_bairro = @COD_BAIRRO,
 			bairro = @BAIRRO
+			WHERE cod_bairro = @COD_BAIRRO
 		END
 		-- INSERT
 		ELSE

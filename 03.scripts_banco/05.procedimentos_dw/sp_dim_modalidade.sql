@@ -16,8 +16,8 @@ BEGIN
 		-- UPDATE
 		IF EXISTS (SELECT cod_modalidade FROM Dim_Modalidade WHERE cod_modalidade = @COD_MODALIDADE)
 		BEGIN
-			UPDATE Dim_Modalidade SET cod_modalidade = @COD_MODALIDADE, modalidade = @MODALIDADE,
-			cod_transportadora = @COD_TRANSPORTADORA
+			UPDATE Dim_Modalidade SET modalidade = @MODALIDADE, cod_transportadora = @COD_TRANSPORTADORA
+			WHERE cod_modalidade = @COD_MODALIDADE
 		END
 		-- INSERT
 		ELSE
