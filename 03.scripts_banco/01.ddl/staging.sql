@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS Aux_Bairro
 
 CREATE TABLE Aux_Entrega (
 	data_carga DATETIME NOT NULL,
-	cod_entrega INT NOT NULL,
+	cod_entrega BIGINT NOT NULL,
 	diasEstimados INT NOT NULL,
 	diasNecessarios INT NULL,
 	dataSaida DATETIME NOT NULL,
@@ -31,7 +31,7 @@ CREATE INDEX IX_Aux_Entrega ON Aux_Entrega(data_carga)
 CREATE TABLE Vio_Entrega (
 	id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	data_carga DATETIME NOT NULL,
-	cod_entrega INT NOT NULL,
+	cod_entrega BIGINT NOT NULL,
 	diasEstimados INT NOT NULL,
 	diasNecessarios INT NOT NULL,
 	dataSaida DATETIME NOT NULL,
