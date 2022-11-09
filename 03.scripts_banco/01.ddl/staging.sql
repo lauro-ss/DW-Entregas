@@ -24,6 +24,7 @@ CREATE TABLE Aux_Entrega (
 	cod_destino INT NOT NULL,
 	cod_status INT NOT NULL,
 	cod_modalidade INT NOT NULL,
+	cod_transportadora INT NOT NULL
 )
 
 CREATE INDEX IX_Aux_Entrega ON Aux_Entrega(data_carga)
@@ -42,6 +43,7 @@ CREATE TABLE Vio_Entrega (
 	cod_destino INT NOT NULL,
 	cod_status INT NOT NULL,
 	cod_modalidade INT NOT NULL,
+	cod_transportadora INT NOT NULL,
 	data_erro DATETIME NOT NULL,
 	violacao VARCHAR(150) NOT NULL
 )
