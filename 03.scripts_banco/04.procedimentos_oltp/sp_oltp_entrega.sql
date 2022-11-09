@@ -8,11 +8,10 @@ BEGIN
 	SELECT @DATA_CARGA, E.id, E.diasEstimados,
 		   E.diasNecessarios, E.dataSaida, E.dataEntrega,
 		   E.foraDoPrazo, E.frete,
-		   BO.id, BD.id,
-		   E.idStatus, E.idModalidade
-		   FROM Entrega E INNER JOIN ENDERECO EO
-		   ON(E.idOrigem = EO.id) INNER JOIN Bairro BO
-		   ON(EO.idBairro = BO.id) INNER JOIN ENDERECO ED
-		   ON(E.idDestino = ED.id) INNER JOIN Bairro BD
-		   ON(ED.idBairro = BD.id)
+		   EO.idBairro, ED.idBairro,
+		   E.idStatus, E.idModalidade, M.idTransportadora
+		   FROM Entrega E 
+		   INNER JOIN ENDERECO EO ON(E.idOrigem = EO.id) 
+		   INNER JOIN ENDERECO ED ON(E.idDestino = ED.id)
+		   INNER JOIN Modalidade M ON(E.idModalidade = M.id)
 END
