@@ -3,8 +3,8 @@
 USE bd_rede_entregas
 
 DROP TABLE IF EXISTS Fato_Entrega
-DROP TABLE IF EXISTS Fato_Status_Regiao_Mes
-DROP TABLE IF EXISTS Fato_Status_Estado_Mes
+DROP TABLE IF EXISTS Fato_Status_Transportadora_Mes
+DROP TABLE IF EXISTS Fato_Status_Modalidade_Mes
 DROP TABLE IF EXISTS Dim_Status
 DROP TABLE IF EXISTS Dim_Modalidade
 DROP TABLE IF EXISTS Dim_Transportadora
@@ -103,36 +103,36 @@ CREATE INDEX IX_FATO_status ON Fato_Entrega(status)
 CREATE INDEX IX_FATO_modalidade ON Fato_Entrega(modalidade)
 CREATE INDEX IX_FATO_transportadora ON Fato_Entrega(transportadora)
 
-CREATE TABLE Fato_Status_Regiao_Mes (
+CREATE TABLE Fato_Status_Transportadora_Mes (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	mes_saida BIGINT NOT NULL,
-	regiao INT NOT NULL,
+	transportadora INT NOT NULL,
 	status INT NOT NULL,
 	quantidade INT NOT NULL DEFAULT (1),
 
-	CONSTRAINT FK_Fato_Status_Regiao_Mes_Dim_Status FOREIGN KEY (status) REFERENCES Dim_Status (id),
-	CONSTRAINT FK_Fato_Status_Regiao_Mes_Dim_Localidade_origem FOREIGN KEY (regiao) REFERENCES Dim_Localidade (id),
-	CONSTRAINT FK_Fato_Status_Regiao_Mes_mes_saida FOREIGN KEY (mes_saida) REFERENCES Dim_Tempo (id),
+	CONSTRAINT FK_Fato_Status_Transportadora_Mes_Dim_Status FOREIGN KEY (status) REFERENCES Dim_Status (id),
+	CONSTRAINT FK_Fato_Status_Transportadora_Mes_Dim_Localidade_origem FOREIGN KEY (transportadora) REFERENCES Dim_Transportadora (id),
+	CONSTRAINT FK_Fato_Status_Transportadora_Mes_mes_saida FOREIGN KEY (mes_saida) REFERENCES Dim_Tempo (id),
 )
 
-CREATE INDEX IX_Fato_Status_Regiao_Mes_mes_saida ON Fato_Status_Regiao_Mes(mes_saida)
-CREATE INDEX IX_Fato_Status_Regiao_Mes_regiao ON Fato_Status_Regiao_Mes(regiao)
-CREATE INDEX IX_Fato_Status_Regiao_Mes_status ON Fato_Status_Regiao_Mes(status)
+CREATE INDEX IX_Fato_Status_Regiao_Mes_mes_saida ON Fato_Status_Transportadora_Mes(mes_saida)
+CREATE INDEX IX_Fato_Status_Regiao_Mes_regiao ON Fato_Status_Transportadora_Mes(transportadora)
+CREATE INDEX IX_Fato_Status_Regiao_Mes_status ON Fato_Status_Transportadora_Mes(status)
 
-CREATE TABLE Fato_Status_Estado_Mes (
+CREATE TABLE Fato_Status_Modalidade_Mes (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	mes_saida BIGINT NOT NULL,
-	estado INT NOT NULL,
+	modalidade INT NOT NULL,
 	status INT NOT NULL,
 	quantidade INT NOT NULL DEFAULT (1),
 
 	CONSTRAINT FK_Fato_Status_Estado_Mes_Dim_Status FOREIGN KEY (status) REFERENCES Dim_Status (id),
-	CONSTRAINT FK_Fato_Status_Estado_Mes_Dim_Localidade_origem FOREIGN KEY (estado) REFERENCES Dim_Localidade (id),
+	CONSTRAINT FK_Fato_Status_Estado_Mes_Dim_Localidade_origem FOREIGN KEY (modalidade) REFERENCES Dim_Modalidade (id),
 	CONSTRAINT FK_Fato_Status_Estado_Mes_mes_saida FOREIGN KEY (mes_saida) REFERENCES Dim_Tempo (id),
 )
 
-CREATE INDEX IX_Fato_Status_Estado_Mes_mes_saida ON Fato_Status_Estado_Mes(mes_saida)
-CREATE INDEX IX_Fato_Status_Estado_Mes_estado ON Fato_Status_Estado_Mes(estado)
-CREATE INDEX IX_Fato_Status_Estado_Mes_status ON Fato_Status_Estado_Mes(status)
+CREATE INDEX IX_Fato_Status_Modalidade_Mes_mes_saida ON Fato_Status_Modalidade_Mes(mes_saida)
+CREATE INDEX IX_Fato_Status_Modalidade_Mes_modalidade ON Fato_Status_Modalidade_Mes(modalidade)
+CREATE INDEX IX_Fato_Status_Modalidade_Mes_status ON Fato_Status_Modalidade_Mes(status)
 
 
