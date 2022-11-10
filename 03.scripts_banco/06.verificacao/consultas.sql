@@ -129,19 +129,19 @@ INNER JOIN Dim_Tempo T ON (E.data_saida = T.id)
 WHERE T.semestre = 2 AND E.foraDoPrazo = 'SIM'
 GROUP BY TR.transportadora, M.modalidade, T.nome_mes
 
--- Qual o número de entregas por região, por status e período?
-SELECT SUM(E.quantidade) 'Quantidade', S.status, L.regiao, T.nome_mes FROM Fato_Entrega E 
+-- Qual o número de entregas por transportadora, por status e período?
+SELECT SUM(E.quantidade) 'Quantidade', S.status, TR.transportadora, T.nome_mes FROM Fato_Entrega E 
 INNER JOIN Dim_Status S ON (E.status = S.id)
-INNER JOIN Dim_Localidade L ON(E.destino = L.id)
+INNER JOIN Dim_Transportadora TR ON (E.transportadora = TR.id)
 INNER JOIN Dim_Tempo T ON (E.data_saida = T.id)
 WHERE T.semestre = 2
-GROUP BY L.regiao, S.status, T.nome_mes
+GROUP BY TR.transportadora, S.status, T.nome_mes
 
--- Qual o número de entregas por estado, por status e período?
-SELECT SUM(E.quantidade) 'Quantidade', S.status, L.estado, T.nome_mes FROM Fato_Entrega E 
+-- Qual o número de entregas por modalidade, por status e período?
+SELECT SUM(E.quantidade) 'Quantidade', S.status, M.modalidade, T.nome_mes FROM Fato_Entrega E 
 INNER JOIN Dim_Status S ON (E.status = S.id)
-INNER JOIN Dim_Localidade L ON(E.destino = L.id)
+INNER JOIN Dim_Modalidade M ON(E.modalidade = M.id)
 INNER JOIN Dim_Tempo T ON (E.data_saida = T.id)
 WHERE T.semestre = 2
-GROUP BY L.estado, S.status, T.nome_mes
+GROUP BY M.modalidade, S.status, T.nome_mes
 
