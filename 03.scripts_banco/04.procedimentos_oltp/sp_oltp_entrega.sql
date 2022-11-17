@@ -1,5 +1,6 @@
 USE bd_rede_entregas
 
+-- data inicial e data final, trigger e data_atualiza
 CREATE OR ALTER PROCEDURE SP_OLTP_ENTREGA (@DATA_CARGA DATETIME) AS
 BEGIN
 	DELETE Aux_Entrega WHERE DATA_CARGA = @DATA_CARGA
