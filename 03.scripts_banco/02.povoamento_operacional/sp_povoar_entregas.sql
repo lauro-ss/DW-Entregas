@@ -1,4 +1,14 @@
 USE bd_rede_entregas
+-- Criar primeiro as functions e entao os procedures um por um
+-- se tentar criar todos de uma vez ira gerar erros
+
+DROP FUNCTION IF EXISTS dbo.dif_dias
+DROP FUNCTION IF EXISTS dbo.aleatorio
+DROP FUNCTION IF EXISTS dbo.ex_aleatorio
+DROP FUNCTION IF EXISTS dbo.calcula_frete
+DROP FUNCTION IF EXISTS dbo.verifica_data
+DROP PROCEDURE IF EXISTS SP_POVOAR_ENTREGAS
+
 
 CREATE OR ALTER FUNCTION dbo.dif_dias(@DATA_INICIO DATETIME, @DIAS INT)
 RETURNS DATETIME
@@ -32,6 +42,7 @@ BEGIN
     RETURN (SELECT FLOOR(@RAND*(@MAIOR-@MENOR+1)+@MENOR))
 END
 
+-- GERA UM NUMERO ALEATORIO COM EXCECAO DO INTEIRO @EX
 CREATE OR ALTER FUNCTION dbo.ex_aleatorio(@RAND FLOAT, @MAIOR INT, @MENOR INT, @EX INT)
 RETURNS INT
 AS

@@ -7,5 +7,5 @@
 -- sp_povoar_enderecos
 -- sp_povoar_entregas
 
-As versões lite geram um menor número de linhas, interessantes
+As versões lite geram 10000 linhas, interessantes
 para testes rápidos

@@ -1,7 +1,6 @@
--- Scripts para povoar o ambiente operacional
-
-
 USE bd_rede_entregas
+
+DROP PROCEDURE IF EXISTS SP_POVOAR_ENDERECO
 
 -- Insere um endereco para cada bairro
 CREATE OR ALTER PROCEDURE SP_POVOAR_ENDERECO AS
