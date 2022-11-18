@@ -116,6 +116,7 @@ CREATE INDEX IX_Entrega_Origem ON Entrega (idOrigem)
 CREATE INDEX IX_Entrega_Destino ON Entrega (idDestino)
 CREATE INDEX IX_Entrega_Status ON Entrega (idStatus)
 CREATE INDEX IX_Entrega_Modalidade ON Entrega (idModalidade)
+CREATE INDEX IX_Entrega_dataAtualizacao ON Entrega (dataAtualizacao)
 
 
 
