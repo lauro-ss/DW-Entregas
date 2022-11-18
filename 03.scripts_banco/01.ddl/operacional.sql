@@ -104,6 +104,7 @@ CREATE TABLE Entrega (
 	idDestino INT NOT NULL,
 	idStatus INT NOT NULL,
 	idModalidade INT NOT NULL,
+	dataAtualizacao DATETIME NOT NULL DEFAULT(GETDATE())
 
 	CONSTRAINT FK_idOrigem FOREIGN KEY (idOrigem) REFERENCES Endereco (id),
 	CONSTRAINT FK_idDestino FOREIGN KEY (idDestino) REFERENCES Endereco (id),
