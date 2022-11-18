@@ -245,7 +245,7 @@ BEGIN
 					dbo.aleatorio(RAND(), 8, 1))
 		END
 		
-		-- 1000 ENTREGAS POR DIA
+		
 		IF(@CONT_DIAS = 1000)
 		BEGIN
 			SET @DATA = DATEADD(dd,1,@DATA)
@@ -261,6 +261,6 @@ END
 
 EXEC SP_POVOAR_ENTREGAS '20221001'
 
-SELECT TOP 10 dataSaida FROM Entrega
+SELECT * FROM Entrega
 
 
