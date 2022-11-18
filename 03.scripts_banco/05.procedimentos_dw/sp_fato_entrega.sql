@@ -1,20 +1,23 @@
 USE bd_rede_entregas
 
+DROP PROCEDURE IF EXISTS SP_Fato_Status_Transportadora_Mes
+DROP PROCEDURE IF EXISTS SP_Fato_Status_Modalidade_Mes
+DROP PROCEDURE IF EXISTS SP_FATO_ENTREGA
 
 CREATE OR ALTER PROCEDURE SP_Fato_Status_Transportadora_Mes AS
 BEGIN
 	
 	DELETE Fato_Status_Transportadora_Mes
 
-	DECLARE @QUANTIDADE INT, @STATUS VARCHAR(16), @TRANSPORTADORA VARCHAR(45), @MES VARCHAR(15), @ANO INT,
+	DECLARE @QUANTIDADE INT, @STATUS VARCHAR(16), @TRANSPORTADORA VARCHAR(45), @MES INT, @ANO INT,
 			@STATUS_ID INT, @TRANSPORTADORA_ID INT, @MES_ID INT
 
-	DECLARE C_FATO_STATUS_REGIAO_MES CURSOR FOR SELECT SUM(E.quantidade), S.status, TR.transportadora, T.nome_mes, T.ano
+	DECLARE C_FATO_STATUS_REGIAO_MES CURSOR FOR SELECT SUM(E.quantidade), S.status, TR.transportadora, T.mes, T.ano
 												FROM Fato_Entrega E 
 												INNER JOIN Dim_Status S ON (E.status = S.id)
 												INNER JOIN Dim_Transportadora TR ON (E.transportadora = TR.id)
 												INNER JOIN Dim_Tempo T ON (E.data_saida = T.id)
-												GROUP BY S.status, TR.transportadora, T.nome_mes, T.ano
+												GROUP BY S.status, TR.transportadora, T.mes, T.ano
 	
 
 	OPEN C_FATO_STATUS_TRANSPORTADORA_MES
@@ -23,7 +26,7 @@ BEGIN
 	BEGIN
 		SET @STATUS_ID = (SELECT ID FROM Dim_Status WHERE status = @STATUS)
 		SET @TRANSPORTADORA_ID = (SELECT id FROM Dim_Transportadora WHERE transportadora = @TRANSPORTADORA)
-		SET @MES_ID = (SELECT ID FROM Dim_Tempo T WHERE T.nivel = 'MES' AND T.nome_mes = @MES AND T.ano = @ANO)
+		SET @MES_ID = (SELECT ID FROM Dim_Tempo T WHERE T.nivel = 'MES' AND T.mes = @MES AND T.ano = @ANO)
 		
 		INSERT INTO Fato_Status_Transportadora_Mes VALUES (@MES_ID, @TRANSPORTADORA_ID, @STATUS_ID, @QUANTIDADE)
 
@@ -38,15 +41,15 @@ BEGIN
 	
 	DELETE Fato_Status_Modalidade_Mes
 
-	DECLARE @QUANTIDADE INT, @STATUS VARCHAR(16), @MODALIDADE VARCHAR(45), @MES VARCHAR(15), @ANO INT,
+	DECLARE @QUANTIDADE INT, @STATUS VARCHAR(16), @MODALIDADE VARCHAR(45), @MES INT, @ANO INT,
 			@STATUS_ID INT, @MODALIDADE_ID INT, @MES_ID INT
 
-	DECLARE C_FATO_STATUS_MODALIDADE_MES CURSOR FOR SELECT SUM(E.quantidade), S.status, M.modalidade, T.nome_mes, T.ano
+	DECLARE C_FATO_STATUS_MODALIDADE_MES CURSOR FOR SELECT SUM(E.quantidade), S.status, M.modalidade, T.mes, T.ano
 												FROM Fato_Entrega E 
 												INNER JOIN Dim_Status S ON (E.status = S.id)
 												INNER JOIN Dim_Modalidade M ON(E.modalidade = M.id)
 												INNER JOIN Dim_Tempo T ON (E.data_saida = T.id)
-												GROUP BY S.status, M.modalidade, T.nome_mes, T.ano
+												GROUP BY S.status, M.modalidade, T.mes, T.ano
 	
 
 	OPEN C_FATO_STATUS_MODALIDADE_MES
@@ -55,7 +58,7 @@ BEGIN
 	BEGIN
 		SET @STATUS_ID = (SELECT ID FROM Dim_Status WHERE status = @STATUS)
 		SET @MODALIDADE_ID = (SELECT id FROM Dim_Modalidade WHERE modalidade = @MODALIDADE)
-		SET @MES_ID = (SELECT ID FROM Dim_Tempo T WHERE T.nivel = 'MES' AND T.nome_mes = @MES AND T.ano = @ANO)
+		SET @MES_ID = (SELECT ID FROM Dim_Tempo T WHERE T.nivel = 'MES' AND T.mes = @MES AND T.ano = @ANO)
 		
 		INSERT INTO Fato_Status_Modalidade_Mes VALUES (@MES_ID, @MODALIDADE_ID, @STATUS_ID, @QUANTIDADE)
 
@@ -195,10 +198,3 @@ BEGIN
 	CLOSE C_ENTREGA
 	DEALLOCATE C_ENTREGA
 END
-
-EXEC SP_FATO_ENTREGA '20221106'
-EXEC SP_Fato_Status_Transportadora_Mes
-EXEC SP_Fato_Status_Modalidade_Mes
-SELECT * FROM Vio_Entrega
-SELECT * FROM Fato_Status_Transportadora_Mes
-SELECT * FROM Fato_Status_Modalidade_Mes
