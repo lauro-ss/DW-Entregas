@@ -1,7 +1,10 @@
 USE bd_rede_entregas
 
--- data inicial e data final, trigger e data_atualiza
-CREATE OR ALTER PROCEDURE SP_OLTP_ENTREGA (@DATA_CARGA DATETIME) AS
+DROP PROCEDURE IF EXISTS SP_OLTP_ENTREGA
+
+CREATE OR ALTER PROCEDURE SP_OLTP_ENTREGA (@DATA_CARGA DATETIME, 
+										   @DATA_INICIAL DATETIME,
+										   @DATA_FINAL DATETIME) AS
 BEGIN
 	DELETE Aux_Entrega WHERE DATA_CARGA = @DATA_CARGA
 
@@ -15,4 +18,8 @@ BEGIN
 		   INNER JOIN ENDERECO EO ON(E.idOrigem = EO.id) 
 		   INNER JOIN ENDERECO ED ON(E.idDestino = ED.id)
 		   INNER JOIN Modalidade M ON(E.idModalidade = M.id)
+		   WHERE DATEADD(dd, DATEDIFF(dd, 0, E.dataAtualizacao), 0) >= @DATA_INICIAL 
+		   AND 
+		   DATEADD(dd, DATEDIFF(dd, 0, E.dataAtualizacao), 0) <= @DATA_FINAL   
 END
+
