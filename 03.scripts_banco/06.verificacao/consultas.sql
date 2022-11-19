@@ -145,3 +145,19 @@ INNER JOIN Dim_Tempo T ON (E.data_saida = T.id)
 WHERE T.semestre = 2
 GROUP BY M.modalidade, S.status, T.nome_mes, T.ano
 
+-- Dois ultimos indicadores utilizando Agregados
+-- Qual o número de entregas por transportadora, por status e período? (Agregado)
+SELECT SUM(FT.quantidade) 'Quantidade', S.status, TR.transportadora, T.nome_mes, T.ano FROM Fato_Status_Transportadora_Mes FT
+INNER JOIN Dim_Status S ON (FT.status = S.id)
+INNER JOIN Dim_Transportadora TR ON (FT.transportadora = TR.id)
+INNER JOIN Dim_Tempo T ON (FT.mes_saida = T.id)
+WHERE T.semestre = 2
+GROUP BY TR.transportadora, S.status, T.nome_mes, T.ano
+
+-- Qual o número de entregas por modalidade, por status e período? (Agregado)
+SELECT SUM(FM.quantidade) 'Quantidade', S.status, M.modalidade, T.nome_mes, T.ano FROM Fato_Status_Modalidade_Mes FM 
+INNER JOIN Dim_Status S ON (FM.status = S.id)
+INNER JOIN Dim_Modalidade M ON(FM.modalidade = M.id)
+INNER JOIN Dim_Tempo T ON (FM.mes_saida = T.id)
+WHERE T.semestre = 2
+GROUP BY M.modalidade, S.status, T.nome_mes, T.ano
