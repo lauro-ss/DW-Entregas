@@ -12,7 +12,7 @@ BEGIN
 	DECLARE @QUANTIDADE INT, @STATUS VARCHAR(16), @TRANSPORTADORA VARCHAR(45), @MES INT, @ANO INT,
 			@STATUS_ID INT, @TRANSPORTADORA_ID INT, @MES_ID INT
 
-	DECLARE C_FATO_STATUS_REGIAO_MES CURSOR FOR SELECT SUM(E.quantidade), S.status, TR.transportadora, T.mes, T.ano
+	DECLARE C_FATO_STATUS_TRANSPORTADORA_MES CURSOR FOR SELECT SUM(E.quantidade), S.status, TR.transportadora, T.mes, T.ano
 												FROM Fato_Entrega E 
 												INNER JOIN Dim_Status S ON (E.status = S.id)
 												INNER JOIN Dim_Transportadora TR ON (E.transportadora = TR.id)
@@ -106,6 +106,7 @@ BEGIN
 
 		IF @DATA_SAIDA_ID IS NOT NULL AND
 		@ORIGEM_ID IS NOT NULL AND
+		@DESTINO_ID IS NOT NULL AND
 		@STATUS_ID IS NOT NULL AND
 		@MODALIDADE_ID IS NOT NULL AND
 		@TRANSPORTADORA_ID IS NOT NULL
@@ -187,7 +188,7 @@ BEGIN
 						VALUES(@DATA_CARGA, @COD_ENTREGA, @DIAS_ESTIMADOS, @DIAS_NECESSARIOS,
 							   @DATA_SAIDA, @DATA_ENTREGA, @FORA_DO_PRAZO, @FRETE, @COD_ORIGEM,
 							   @COD_DESTINO, @COD_STATUS, @COD_MODALIDADE, @COD_TRANSPORTADORA, 
-							   GETDATE(),'Data, Bairro, Status, Modalidade ou Transportadora não existem nas dimensões.')
+							   GETDATE(),'Data, Localidade, Status, Modalidade ou Transportadora não existem nas dimensões.')
 		END
 
 		FETCH C_ENTREGA INTO @COD_ENTREGA, @DIAS_ESTIMADOS, @DIAS_NECESSARIOS
@@ -197,4 +198,7 @@ BEGIN
 	END
 	CLOSE C_ENTREGA
 	DEALLOCATE C_ENTREGA
+
+	EXEC SP_Fato_Status_Transportadora_Mes
+	EXEC SP_Fato_Status_Modalidade_Mes
 END

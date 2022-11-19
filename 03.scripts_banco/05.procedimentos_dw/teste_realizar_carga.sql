@@ -14,3 +14,5 @@ SELECT * FROM Dim_Localidade
 SELECT * FROM Dim_Modalidade
 SELECT * FROM Dim_Status
 SELECT * FROM Fato_Entrega
+SELECT * FROM Fato_Status_Modalidade_Mes
+SELECT * FROM Fato_Status_Transportadora_Mes
