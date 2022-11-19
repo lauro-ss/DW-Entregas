@@ -52,7 +52,7 @@ CREATE INDEX IX_Dim_Localidade_Cidade ON Dim_Localidade(cod_cidade)
 CREATE INDEX IX_Dim_Localidade_Bairro ON Dim_Localidade(cod_bairro)
 
 CREATE TABLE Dim_Tempo (
-	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	nivel CHAR(3) NOT NULL CHECK(nivel IN ('DIA','MES','ANO')),
 	data DATETIME NULL,
 	dia INT NULL,
@@ -72,10 +72,10 @@ CREATE INDEX IX_Dim_Tempo_ano ON DIM_TEMPO (nivel, ano)
 
 CREATE TABLE Fato_Entrega (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-	data_saida BIGINT NOT NULL,
-	data_entrega BIGINT NULL,
+	data_saida INT NOT NULL,
+	data_entrega INT NULL,
 	origem INT NOT NULL,
-	destino INT NULL,
+	destino INT NOT NULL,
 	status INT NOT NULL,
 	modalidade INT NOT NULL,
 	transportadora INT NOT NULL,
@@ -105,7 +105,7 @@ CREATE INDEX IX_FATO_transportadora ON Fato_Entrega(transportadora)
 
 CREATE TABLE Fato_Status_Transportadora_Mes (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-	mes_saida BIGINT NOT NULL,
+	mes_saida INT NOT NULL,
 	transportadora INT NOT NULL,
 	status INT NOT NULL,
 	quantidade INT NOT NULL DEFAULT (1),
@@ -121,7 +121,7 @@ CREATE INDEX IX_Fato_Status_Regiao_Mes_status ON Fato_Status_Transportadora_Mes(
 
 CREATE TABLE Fato_Status_Modalidade_Mes (
 	id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-	mes_saida BIGINT NOT NULL,
+	mes_saida INT NOT NULL,
 	modalidade INT NOT NULL,
 	status INT NOT NULL,
 	quantidade INT NOT NULL DEFAULT (1),
