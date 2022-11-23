@@ -8,6 +8,11 @@ CREATE OR ALTER PROCEDURE SP_OLTP_ENTREGA (@DATA_CARGA DATETIME,
 BEGIN
 	DELETE Aux_Entrega WHERE DATA_CARGA = @DATA_CARGA
 
+	IF @DATA_INICIAL = @DATA_FINAL
+	BEGIN
+		SET @DATA_FINAL = DATEADD(dd, 1, @DATA_FINAL)
+	END
+
 	INSERT INTO Aux_Entrega
 	SELECT @DATA_CARGA, E.id, E.diasEstimados,
 		   E.diasNecessarios, E.dataSaida, E.dataEntrega,
@@ -18,8 +23,7 @@ BEGIN
 		   INNER JOIN ENDERECO EO ON(E.idOrigem = EO.id) 
 		   INNER JOIN ENDERECO ED ON(E.idDestino = ED.id)
 		   INNER JOIN Modalidade M ON(E.idModalidade = M.id)
-		   WHERE DATEADD(dd, DATEDIFF(dd, 0, E.dataAtualizacao), 0) >= @DATA_INICIAL 
+		   WHERE E.dataAtualizacao >= @DATA_INICIAL 
 		   AND 
-		   DATEADD(dd, DATEDIFF(dd, 0, E.dataAtualizacao), 0) <= @DATA_FINAL   
+		   E.dataAtualizacao < @DATA_FINAL
 END
-
